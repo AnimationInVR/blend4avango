@@ -93,38 +93,23 @@ class B4A_WorldPanel(bpy.types.Panel):
             col = box.column()
             col.label("SSAO Settings:")
             row = col.row()
-            row.prop(ssao, "radius_increase", text="Radius Increase")
-            row = col.row()
-            row.prop(ssao, "hemisphere", text="Use Hemisphere")
-            row = col.row()
-            row.prop(ssao, "blur_depth", text="Use Blur Depth Test")
-            row = col.row()
-            row.prop(ssao, "blur_discard_value", text="Blur Depth Test Discard Value")
-            row = col.row()
-            row.prop(ssao, "influence", text="Influence")
-            row = col.row()
-            row.prop(ssao, "dist_factor", text="Distance Factor")
-            row = col.row()
-            row.label("Samples:")
-            row.prop(ssao, "samples", text="Samples", expand=True)
-            row = col.row()
             row.prop(ssao, "radius", text="Radius")
             row = col.row()
             row.prop(ssao, "intensity", text="Intensity")
             row = col.row()
             row.prop(ssao, "fallof", text="Fallof")
 
-            god_rays = world.b4a_god_rays_settings
-            row = layout.row()
-            box = row.box()
-            col = box.column()
-            col.label("God Rays Settings:")
-            row = col.row()
-            row.prop(god_rays, "intensity", text="God Rays Intensity")
-            row = col.row()
-            row.prop(god_rays, "max_ray_length", text="Maximum Ray Length")
-            row = col.row()
-            row.prop(god_rays, "steps_per_pass", text="Steps Per Pass")
+            #god_rays = world.b4a_god_rays_settings
+            #row = layout.row()
+            #box = row.box()
+            #col = box.column()
+            #col.label("God Rays Settings:")
+            #row = col.row()
+            #row.prop(god_rays, "intensity", text="God Rays Intensity")
+            #row = col.row()
+            #row.prop(god_rays, "max_ray_length", text="Maximum Ray Length")
+            #row = col.row()
+            #row.prop(god_rays, "steps_per_pass", text="Steps Per Pass")
 
             bloom = world.b4a_bloom_settings
             row = layout.row()
@@ -132,11 +117,11 @@ class B4A_WorldPanel(bpy.types.Panel):
             col = box.column()
             col.label("Bloom settings:")
             row = col.row()
-            row.prop(bloom, "key", text="Key")
+            row.prop(bloom, "radius", text="Radius")
             row = col.row()
-            row.prop(bloom, "blur", text="Blur")
+            row.prop(bloom, "threshold", text="Threshold")
             row = col.row()
-            row.prop(bloom, "edge_lum", text="Edge Luminance")
+            row.prop(bloom, "intensity", text="Intensity")
 
             fog = world.b4a_fog_settings
             row = layout.row()
@@ -176,13 +161,13 @@ class B4A_WorldPanel(bpy.types.Panel):
             row = col.row()
             row.prop(vignette, "softness", text="Softness")
 
-            key = world.b4a_hdr_settings
+            hdr = world.b4a_hdr_settings
             row = layout.row()
             box = row.box()
             col = box.column()
             col.label("HDR settings:")
             row = col.row()
-            row.prop(bloom, "key", text="Key")
+            row.prop(hdr, "key", text="Key")
 
 class B4A_DataPanel(bpy.types.Panel):
     bl_label = "Blend4Avango"

@@ -232,34 +232,29 @@ TEMPLATE_GOD_RAY_SETTINGS = """\
 TEMPLATE_BLOOM_SETTINGS = """\
         "bloom_settings": {
             "enable":%(enable)s,
-            "key":%(key)d,
-            "blur":%(blur)d,
-            "edge_lum":%(edge_lum)d
+            "radius":%(radius)d,
+            "threshold":%(threshold)d,
+            "intensity":%(intensity)d
         }"""
 
 TEMPLATE_PIPELINE_OPTIONS = """\
-        "pipeline_options": {
-            "enable_preview_display":%(enable_preview_display)s,
-            "enable_fps_display":%(enable_fps_display)s,
-            "enable_ray_display":%(enable_ray_display)s,
-            "enable_bbox_display":%(enable_bbox_display)s,
-            "enable_FXAA":%(enable_FXAA)s,
-            "enable_frustum_culling":%(enable_frustum_culling)s,
-            "enable_backface_culling":%(enable_backface_culling)s,
-            "near_clip":%(near_clip)d,
-            "far_clip":%(far_clip)d
-        }"""
+        "enable_preview_display":%(enable_preview_display)s,
+        "enable_fps_display":%(enable_fps_display)s,
+        "enable_ray_display":%(enable_ray_display)s,
+        "enable_bbox_display":%(enable_bbox_display)s,
+        "enable_FXAA":%(enable_FXAA)s,
+        "enable_frustum_culling":%(enable_frustum_culling)s,
+        "enable_backface_culling":%(enable_backface_culling)s,
+        "near_clip":%(near_clip)d,
+        "far_clip":%(far_clip)d
+        """
 
 TEMPLATE_SSAO_SETTINGS = """\
         "ssao_settings": {
             "enable":%(enable)s,
-            "radius_increase":%(radius_increase)d,
-            "hemisphere":%(hemisphere)s,
-            "blur_depth":%(blur_depth)s,
-            "blur_discard_value":%(blur_discard_value)d,
-            "binfluencelur":%(influence)d,
-            "dist_factor":%(dist_factor)d,
-            "samples":%(samples)d
+            "radius":%(radius)d,
+            "intensity":%(intensity)d,
+            "falloff":%(falloff)d
         }"""
 
 TEMPLATE_FOG_SETTINGS = """\
@@ -2504,7 +2499,7 @@ def generate_ascii_scene(data,scene):
     sections = [
     ["objects",    objects],
     ["cameras",    cameras],
-    ["options",     options]
+    ["pipeline_options",     options]
     ]
 
 
@@ -2618,7 +2613,7 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
 def generate_option(world,scene):
     chunks = []
     chunks.append(generate_pipeline_options(world,scene))
-    chunks.append(generate_god_ray(world,scene))
+    #chunks.append(generate_god_ray(world,scene))
     chunks.append(generate_bloom(world,scene))
     chunks.append(generate_ssao(world,scene))
     chunks.append(generate_fog(world,scene))
@@ -2681,9 +2676,9 @@ def generate_bloom(world,scene):#TODO
 
     bloom_string = TEMPLATE_BLOOM_SETTINGS % {
         "enable"            : str(scene.b4a_enable_bloom).lower(),
-        "key"         : round_num(bloom.key, 2),
-        "blur"      : round_num(bloom.blur, 2),
-        "edge_lum"      : round_num(bloom.edge_lum, 2)
+        "radius"         : round_num(bloom.radius, 2),
+        "threshold"      : round_num(bloom.threshold, 2),
+        "intensity"      : round_num(bloom.intensity, 2)
     }
     
     return bloom_string
@@ -2699,13 +2694,9 @@ def generate_ssao(world,scene):#TODO
 
     ssao_string = TEMPLATE_SSAO_SETTINGS % {
         "enable"            : str(scene.b4a_enable_ssao).lower(),
-        "radius_increase"         : round_num(ssao.radius_increase, 2),
-        "hemisphere"      : str(ssao.hemisphere).lower(),
-        "blur_depth"      : str(ssao.blur_depth).lower(),
-        "blur_discard_value"         : round_num(ssao.blur_discard_value, 2),
-        "influence"      : round_num(ssao.influence, 3),
-        "dist_factor"      : round_num(ssao.dist_factor, 2),
-        "samples"         : int(ssao.samples)
+        "radius"         : round_num(ssao.radius, 2),
+        "intensity"      : round_num(ssao.intensity, 2),
+        "falloff"      : round_num(ssao.falloff, 2)
     }
     
     return ssao_string

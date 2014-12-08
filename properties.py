@@ -488,58 +488,6 @@ class B4A_ColorCorrectionSettings(bpy.types.PropertyGroup):
 
 class B4A_SSAOSettings(bpy.types.PropertyGroup):
 
-    radius_increase = bpy.props.FloatProperty(
-        name = "radius_increase",
-        description = "Radius Increase",
-        default = 3.0,
-        min = 0.0,
-        max = 15.0,
-        step = 0.01,
-        precision = 2
-    )
-
-    hemisphere = bpy.props.BoolProperty(
-        name = "hemisphere",
-        description = "Calculation ssao with hemisphere",
-        default = False
-    )
-
-    blur_depth = bpy.props.BoolProperty(
-        name = "blur_depth",
-        description = "Apply edge-preserving blur to ssao",
-        default = False
-    )
-
-    blur_discard_value = bpy.props.FloatProperty(
-        name = "blur_discard_value",
-        description = "Blur depth discard value",
-        default = 1.0,
-        min = 0.0,
-        max = 2.0,
-        step = 0.01,
-        precision = 1
-    )
-
-    influence = bpy.props.FloatProperty(
-        name = "influence",
-        description = "How much AO affects the final rendering",
-        default = 0.7,
-        min = 0.0,
-        max = 1.0,
-        step = 0.005,
-        precision = 3
-    )
-
-    dist_factor = bpy.props.FloatProperty(
-        name = "dist_factor",
-        description = "How much AO decreases with distance",
-        default = 0.0,
-        min = 0.0,
-        max = 20.0,
-        step = 0.01,
-        precision = 2
-    )
-
     radius = bpy.props.FloatProperty(
         name = "radius",
         description = "radius",
@@ -560,26 +508,14 @@ class B4A_SSAOSettings(bpy.types.PropertyGroup):
         precision = 2
     )
 
-    fallof = bpy.props.FloatProperty(
-        name = "fallof",
-        description = "fallof",
+    falloff = bpy.props.FloatProperty(
+        name = "falloff",
+        description = "falloff",
         default = 0.0,
         min = 0.0,
         max = 20.0,
         step = 0.01,
         precision = 2
-    )
-
-    samples = bpy.props.EnumProperty(
-        name = "samples",
-        description = "Number of samples aka quality",
-        default = "16",
-        items = [
-            ("8", "8", "0", 0),
-            ("16", "16", "1", 1),
-            ("24", "24", "2", 2),
-            ("32", "32", "3", 3),
-        ]
     )
 
 
@@ -617,32 +553,32 @@ class B4A_GodRaysSettings(bpy.types.PropertyGroup):
 
 class B4A_BloomSettings(bpy.types.PropertyGroup):
 
-    key = bpy.props.FloatProperty(
-        name = "key",
-        description = "Key multiplier",
-        default = 1.0,
-        min = 0.0,
-        max = 5.0,
-        step = 0.01,
-        precision = 2
-    )
-
-    blur = bpy.props.FloatProperty(
-        name = "blur",
-        description = "Bloom blur strength",
-        default = 4.0,
+    radius = bpy.props.FloatProperty(
+        name = "radius",
+        description = "radius",
+        default = 0.0,
         min = 0.0,
         max = 20.0,
         step = 0.01,
         precision = 2
     )
 
-    edge_lum = bpy.props.FloatProperty(
-        name = "edge_lum",
-        description = "Bloom edge relative luminance (bloom starts above this value)",
-        default = 1.0,
+    threshold = bpy.props.FloatProperty(
+        name = "threshold",
+        description = "threshold",
+        default = 0.0,
         min = 0.0,
-        max = 3.0,
+        max = 20.0,
+        step = 0.01,
+        precision = 2
+    )
+
+    intensity = bpy.props.FloatProperty(
+        name = "intensity",
+        description = "intensity",
+        default = 0.0,
+        min = 0.0,
+        max = 20.0,
         step = 0.01,
         precision = 2
     )
