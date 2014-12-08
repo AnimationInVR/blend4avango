@@ -1,4 +1,5 @@
 import bpy
+import sys
 import mathutils
 from collections import OrderedDict
 import hashlib
@@ -97,18 +98,21 @@ TEMPLATE_SECTION = """
 
 TEMPLATE_OBJECT = """\
 		%(object_id)s: {
+            "type"      : %(type)s,
 			"geometry"      : %(geometry_id)s,
-			"groups"        : [ %(group_id)s ],
 			"material"      : %(material_id)s,
 			"position"      : %(position)s,
-			"rotation"      : %(rotation)s,
 			"quaternion"    : %(quaternion)s,
 			"scale"         : %(scale)s,
-			"visible"       : %(visible)s,
+			
 			"castShadow"    : %(castShadow)s,
 			"receiveShadow" : %(receiveShadow)s,
-			"doubleSided"   : %(doubleSided)s
 		}"""
+
+            #"groups"        : [ %(group_id)s ],
+            #"rotation"      : %(rotation)s,
+            #"visible"       : %(visible)s,
+            #"doubleSided"   : %(doubleSided)s
 
 TEMPLATE_EMPTY = """\
 		%(object_id)s: {
@@ -170,17 +174,16 @@ TEMPLATE_LIGHT_POINT = """\
 		%(light_id)s: {
 			"type"      : "PointLight",
 			"position"  : %(position)s,
-			"rotation"  : %(rotation)s,
 			"color"     : %(color)d,
 			"distance"  : %(distance).3f,
 			"intensity" : %(intensity).3f
 		}"""
+            #"rotation"  : %(rotation)s,
 
 TEMPLATE_LIGHT_SUN = """\
 		%(light_id)s: {
 			"type"      : "AmbientLight",
 			"position"  : %(position)s,
-			"rotation"  : %(rotation)s,
 			"color"     : %(color)d,
 			"distance"  : %(distance).3f,
 			"intensity" : %(intensity).3f
@@ -190,7 +193,6 @@ TEMPLATE_LIGHT_SPOT = """\
 		%(light_id)s: {
 			"type"       : "SpotLight",
 			"position"   : %(position)s,
-			"rotation"   : %(rotation)s,
 			"color"      : %(color)d,
 			"distance"   : %(distance).3f,
 			"intensity"  : %(intensity).3f,
@@ -202,7 +204,6 @@ TEMPLATE_LIGHT_HEMI = """\
 		%(light_id)s: {
 			"type"      : "HemisphereLight",
 			"position"  : %(position)s,
-			"rotation"  : %(rotation)s,
 			"color"     : %(color)d,
 			"distance"  : %(distance).3f,
 			"intensity" : %(intensity).3f
@@ -212,7 +213,6 @@ TEMPLATE_LIGHT_AREA = """\
 		%(light_id)s: {
 			"type"      : "AreaLight",
 			"position"  : %(position)s,
-			"rotation"  : %(rotation)s,
 			"color"     : %(color)d,
 			"distance"  : %(distance).3f,
 			"intensity" : %(intensity).3f,
@@ -224,19 +224,35 @@ TEMPLATE_LIGHT_AREA = """\
 
 TEMPLATE_GOD_RAY_SETTINGS = """\
         "god_ray_settings": {
+            "enable":%(enable)s,
             "intensity":%(intensity)d,
             "maxraylenght":%(maxraylenght)d,
             "stepsperpass":%(stepsperpass)d
         }"""
 TEMPLATE_BLOOM_SETTINGS = """\
         "bloom_settings": {
+            "enable":%(enable)s,
             "key":%(key)d,
             "blur":%(blur)d,
             "edge_lum":%(edge_lum)d
         }"""
 
+TEMPLATE_PIPELINE_OPTIONS = """\
+        "pipeline_options": {
+            "enable_preview_display":%(enable_preview_display)s,
+            "enable_fps_display":%(enable_fps_display)s,
+            "enable_ray_display":%(enable_ray_display)s,
+            "enable_bbox_display":%(enable_bbox_display)s,
+            "enable_FXAA":%(enable_FXAA)s,
+            "enable_frustum_culling":%(enable_frustum_culling)s,
+            "enable_backface_culling":%(enable_backface_culling)s,
+            "near_clip":%(near_clip)d,
+            "far_clip":%(far_clip)d
+        }"""
+
 TEMPLATE_SSAO_SETTINGS = """\
-        "bloom_settings": {
+        "ssao_settings": {
+            "enable":%(enable)s,
             "radius_increase":%(radius_increase)d,
             "hemisphere":%(hemisphere)s,
             "blur_depth":%(blur_depth)s,
@@ -244,6 +260,36 @@ TEMPLATE_SSAO_SETTINGS = """\
             "binfluencelur":%(influence)d,
             "dist_factor":%(dist_factor)d,
             "samples":%(samples)d
+        }"""
+
+TEMPLATE_FOG_SETTINGS = """\
+        "fog_settings": {
+            "enable":%(enable)s,
+            "start":%(start)d,
+            "end":%(end)d,
+            "texture":%(texture)s,
+            "color":%(color)s
+        }"""
+
+TEMPLATE_BACKGROUND_SETTINGS = """\
+        "background_settings": {
+            "mode":%(mode)d,
+            "texture":%(texture)s,
+            "color":%(color)s
+        }""" 
+
+TEMPLATE_VIGNETTE_SETTINGS = """\
+        "vignette_settings": {
+            "enable":%(enable)s,
+            "color":%(color)s,
+            "coverage":%(coverage)d,
+            "softness":%(softness)d
+        }"""
+
+TEMPLATE_HDR_SETTINGS = """\
+        "hdr_settings": {
+            "enable":%(enable)s,
+            "key":%(key)s
         }"""
 
 TEMPLATE_VEC4 = '[ %g, %g, %g, %g ]'
@@ -1827,20 +1873,22 @@ def generate_bool_property(property):
 # Scene exporter - objects
 # #####################################################
 
-def generate_objects(data):
+def generate_objects(data,scene):
     chunks = []
 
     for obj in data["objects"]:
 
         if obj.type == "MESH" and obj.THREE_exportGeometry:
+            type_string = '"TriMeshGeometry"'
             object_id = obj.name
+            path = "/data/objects/"
 
             #if len(obj.modifiers) > 0:
             #    geo_name = obj.name
             #else:
             geo_name = obj.data.name
 
-            geometry_id = "geo_%s" % geo_name
+            geometry_id = obj.data.name
 
             material_ids = generate_material_id_list(obj.material_slots)
             group_ids = generate_group_id_list(obj)
@@ -1856,10 +1904,12 @@ def generate_objects(data):
             # use empty material string for multi-material objects
             # this will trigger use of MeshFaceMaterial in SceneLoader
 
-            material_string = '""'
+            material_string = ''
             if len(material_ids) == 1:
                 material_string = generate_string_list(material_ids)
 
+            materialSplit = material_string.split('"')
+            material_string = materialSplit[0]
             group_string = ""
             if len(group_ids) > 0:
                 group_string = generate_string_list(group_ids)
@@ -1870,28 +1920,27 @@ def generate_objects(data):
 
             visible = obj.THREE_visible
 
-            geometry_string = generate_string(geometry_id)
+            geometry_string = generate_string('/data/objects/' + geometry_id + '.obj')
 
             object_string = TEMPLATE_OBJECT % {
+            "type"   : type_string,
             "object_id"   : generate_string(object_id),
             "geometry_id" : geometry_string,
-            "group_id"    : group_string,
-            "material_id" : material_string,
-
+            "material_id" : '"/data/materials/' + material_string + '.gmd"',
             "position"    : generate_vec3(position),
-            "rotation"    : generate_vec3(rotation),
             "quaternion"  : generate_quat(quaternion),
             "scale"       : generate_vec3(scale),
-
             "castShadow"  : generate_bool_property(castShadow),
-            "receiveShadow"  : generate_bool_property(receiveShadow),
-            "doubleSided"  : generate_bool_property(doubleSided),
-            "visible"      : generate_bool_property(visible)
+            "receiveShadow"  : generate_bool_property(receiveShadow)
+            #"group_id"    : group_string,
+            #"doubleSided"  : generate_bool_property(doubleSided),
+            #"visible"      : generate_bool_property(visible)
+            #"rotation"    : generate_vec3(rotation),
             }
             chunks.append(object_string)
 
         elif obj.type == "EMPTY" or (obj.type == "MESH" and not obj.THREE_exportGeometry):
-
+            type_string = "Empty"
             object_id = obj.name
             group_ids = generate_group_id_list(obj)
 
@@ -1908,6 +1957,7 @@ def generate_objects(data):
                 group_string = generate_string_list(group_ids)
 
             object_string = TEMPLATE_EMPTY % {
+            "type"   : type_string,
             "object_id"   : generate_string(object_id),
             "group_id"    : group_string,
 
@@ -2341,7 +2391,7 @@ def generate_lights(data):
                 light_string = TEMPLATE_LIGHT_POINT % {
                     "light_id"      : generate_string(concrete_lamp.name),
                     "position"      : generate_vec3(lamp.location, data["flipyz"]),
-                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    #"rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
                     "color"         : rgb2int(concrete_lamp.color),
                     "distance"      : concrete_lamp.distance,
                     "intensity"        : concrete_lamp.energy
@@ -2350,7 +2400,7 @@ def generate_lights(data):
                 light_string = TEMPLATE_LIGHT_SUN % {
                     "light_id"      : generate_string(concrete_lamp.name),
                     "position"      : generate_vec3(lamp.location, data["flipyz"]),
-                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    #"rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
                     "color"         : rgb2int(concrete_lamp.color),
                     "distance"      : concrete_lamp.distance,
                     "intensity"        : concrete_lamp.energy
@@ -2359,7 +2409,7 @@ def generate_lights(data):
                 light_string = TEMPLATE_LIGHT_SPOT % {
                     "light_id"      : generate_string(concrete_lamp.name),
                     "position"      : generate_vec3(lamp.location, data["flipyz"]),
-                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    #"rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
                     "color"         : rgb2int(concrete_lamp.color),
                     "distance"      : concrete_lamp.distance,
                     "intensity"        : concrete_lamp.energy,
@@ -2370,7 +2420,7 @@ def generate_lights(data):
                 light_string = TEMPLATE_LIGHT_HEMI % {
                     "light_id"      : generate_string(concrete_lamp.name),
                     "position"      : generate_vec3(lamp.location, data["flipyz"]),
-                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    #"rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
                     "color"         : rgb2int(concrete_lamp.color),
                     "distance"      : concrete_lamp.distance,
                     "intensity"        : concrete_lamp.energy
@@ -2379,7 +2429,7 @@ def generate_lights(data):
                 light_string = TEMPLATE_LIGHT_AREA % {
                     "light_id"      : generate_string(concrete_lamp.name),
                     "position"      : generate_vec3(lamp.location, data["flipyz"]),
-                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    #"rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
                     "color"         : rgb2int(concrete_lamp.color),
                     "distance"      : concrete_lamp.distance,
                     "intensity"        : concrete_lamp.energy,
@@ -2420,13 +2470,13 @@ def generate_embeds(data):
 
 def generate_ascii_scene(data,scene):
 
-    objects, nobjects = generate_objects(data)
+    objects, nobjects = generate_objects(data,scene)
     geometries, ngeometries = generate_geometries(data)
     textures, ntextures = generate_textures_scene(data)
     materials, nmaterials = generate_materials_scene(data)
     lights, nlights = generate_lights(data)
     cameras, ncameras = generate_cameras(data)
-    options,noptions = generate_option(scene.world)
+    options,noptions = generate_option(scene.world,scene)
 
     embeds = generate_embeds(data)
 
@@ -2437,12 +2487,12 @@ def generate_ascii_scene(data,scene):
             objects = lights
         nobjects += nlights
 
-    if ncameras > 0:
-        if nobjects > 0:
-            objects = objects + ",\n" + cameras
-        else:
-            objects = cameras
-        nobjects += ncameras
+    #if ncameras > 0:
+    #    if nobjects > 0:
+    #        objects = objects + ",\n" + cameras
+    #    else:
+    #        objects = cameras
+    #    nobjects += ncameras
 
     basetype = "relativeTo"
 
@@ -2453,12 +2503,15 @@ def generate_ascii_scene(data,scene):
 
     sections = [
     ["objects",    objects],
-    ["geometries", geometries],
-    ["textures",   textures],
-    ["materials",  materials],
-    ["embeds",     embeds],
+    ["cameras",    cameras],
     ["options",     options]
     ]
+
+
+    #["geometries", geometries],
+    #["textures",   textures],
+    #["materials",  materials],
+    #["embeds",     embeds],
 
     chunks = []
     for label, content in sections:
@@ -2532,19 +2585,73 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
     }
     scene_text += generate_ascii_scene(data,scene)
     write_file(filepath, scene_text)
+    directory = '/Users/yng1905'
+    splittedPath = filepath.split('/')
+    path = ''
+    for x in range(0, len(splittedPath)-1):
+        path += '/' + splittedPath[x]
+
+    if not os.path.exists(path + '/data'):
+        os.makedirs(path + '/data')
+    if not os.path.exists(path + '/data/objects'):
+        os.makedirs(path + '/data/objects')
+
+    path += bpy.path.abspath('/data/objects/')
+    bpy.ops.object.select_all(action='DESELECT')   
+    for ob in scene.objects:
+        # make the current object active and select it
+        scene.objects.active = ob
+        ob.select = True
+
+        # make sure that we only export meshes
+        if ob.type == 'MESH':
+            # export the currently selected object to its own file based on its name
+            bpy.ops.export_scene.obj(filepath=str(path + ob.name + '.obj'), 
+                check_existing=False,
+                use_selection=True,
+                path_mode='AUTO'
+                )
+        # deselect the object and move on to another if any more are left 
+        ob.select = False
 
 
-def generate_option(world):
+def generate_option(world,scene):
     chunks = []
-    chunks.append(generate_god_ray(world))
-    chunks.append(generate_bloom(world))
-    chunks.append(generate_ssao(world))
+    chunks.append(generate_pipeline_options(world,scene))
+    chunks.append(generate_god_ray(world,scene))
+    chunks.append(generate_bloom(world,scene))
+    chunks.append(generate_ssao(world,scene))
+    chunks.append(generate_fog(world,scene))
+    chunks.append(generate_background(world,scene))
+    chunks.append(generate_vignette(world,scene))
+    chunks.append(generate_hdr(world,scene))
     return ",\n".join(chunks), len(chunks)
 # #####################################################
-# Settings exporter - god rays
+# Settings exporter - 
 # #####################################################
+def generate_pipeline_options(world,scene):#TODO
+    
+    world_data = OrderedDict()
 
-def generate_god_ray(world):#TODO
+    world_data["name"] = world.name
+    world_data["uuid"] = gen_uuid(world)
+
+
+    pipeline_string = TEMPLATE_PIPELINE_OPTIONS % {
+        "enable_preview_display"            : str(scene.b4a_enable_preview_display).lower(),
+        "enable_fps_display"            : str(scene.b4a_enable_fps_display).lower(),
+        "enable_ray_display"            : str(scene.b4a_enable_ray_display).lower(),
+        "enable_bbox_display"            : str(scene.b4a_enable_bbox_display).lower(),
+        "enable_FXAA"            : str(scene.b4a_enable_FXAA).lower(),
+        "enable_frustum_culling"            : str(scene.b4a_enable_frustum_culling).lower(),
+        "enable_backface_culling"            : str(scene.b4a_enable_backface_culling).lower(),
+        "near_clip"         : round_num(scene.b4a_near_clip, 2),
+        "far_clip"      : round_num(scene.b4a_far_clip, 2)
+    }
+
+    return pipeline_string
+
+def generate_god_ray(world,scene):#TODO
     
     world_data = OrderedDict()
 
@@ -2553,7 +2660,9 @@ def generate_god_ray(world):#TODO
 
     god_rays = world.b4a_god_rays_settings
 
+
     god_ray_string = TEMPLATE_GOD_RAY_SETTINGS % {
+        "enable"            : str(scene.b4a_enable_ssao).lower(),
         "intensity"         : round_num(god_rays.intensity, 2),
         "maxraylenght"      : round_num(god_rays.max_ray_length, 2),
         "stepsperpass"      : round_num(god_rays.steps_per_pass, 1)
@@ -2561,7 +2670,7 @@ def generate_god_ray(world):#TODO
     
     return god_ray_string
 
-def generate_bloom(world):#TODO
+def generate_bloom(world,scene):#TODO
     
     world_data = OrderedDict()
 
@@ -2571,6 +2680,7 @@ def generate_bloom(world):#TODO
     bloom = world.b4a_bloom_settings
 
     bloom_string = TEMPLATE_BLOOM_SETTINGS % {
+        "enable"            : str(scene.b4a_enable_bloom).lower(),
         "key"         : round_num(bloom.key, 2),
         "blur"      : round_num(bloom.blur, 2),
         "edge_lum"      : round_num(bloom.edge_lum, 2)
@@ -2578,7 +2688,7 @@ def generate_bloom(world):#TODO
     
     return bloom_string
 
-def generate_ssao(world):#TODO
+def generate_ssao(world,scene):#TODO
     
     world_data = OrderedDict()
 
@@ -2588,6 +2698,7 @@ def generate_ssao(world):#TODO
     ssao = world.b4a_ssao_settings
 
     ssao_string = TEMPLATE_SSAO_SETTINGS % {
+        "enable"            : str(scene.b4a_enable_ssao).lower(),
         "radius_increase"         : round_num(ssao.radius_increase, 2),
         "hemisphere"      : str(ssao.hemisphere).lower(),
         "blur_depth"      : str(ssao.blur_depth).lower(),
@@ -2598,6 +2709,76 @@ def generate_ssao(world):#TODO
     }
     
     return ssao_string
+
+def generate_fog(world,scene):#TODO
+    
+    world_data = OrderedDict()
+
+    world_data["name"] = world.name
+    world_data["uuid"] = gen_uuid(world)
+
+    fog = world.b4a_fog_settings
+
+    fog_string = TEMPLATE_FOG_SETTINGS % {
+        "enable"            : str(scene.b4a_enable_fog).lower(),
+        "start"         : round_num(fog.start, 2),
+        "end"         : round_num(fog.end, 2),
+        "texture"      : str(fog.texture).lower(),
+        "color"      : '[' + str(fog.color.r) + ',' + str(fog.color.g) + ',' + str(fog.color.b) + ']'
+    }
+    
+    return fog_string
+
+def generate_background(world,scene):#TODO
+    
+    world_data = OrderedDict()
+
+    world_data["name"] = world.name
+    world_data["uuid"] = gen_uuid(world)
+
+    background = world.b4a_background_settings
+
+    background_string = TEMPLATE_BACKGROUND_SETTINGS % {
+        "mode"         : round_num(background.mode, 2),
+        "texture"      : str(background.texture).lower(),
+        "color"      : '[' + str(background.color.r) + ',' + str(background.color.g) + ',' + str(background.color.b) + ']'
+    }
+    
+    return background_string
+
+def generate_vignette(world,scene):#TODO
+    
+    world_data = OrderedDict()
+
+    world_data["name"] = world.name
+    world_data["uuid"] = gen_uuid(world)
+
+    vignette = world.b4a_vignette_settings
+
+    vignette_string = TEMPLATE_VIGNETTE_SETTINGS % {
+        "enable"            : str(scene.b4a_enable_vignette).lower(),
+        "color"      : '[' + str(vignette.color.r) + ',' + str(vignette.color.g) + ',' + str(vignette.color.b) + ']',
+        "coverage"         : round_num(vignette.coverage, 2),
+        "softness"      : round_num(vignette.softness, 2)
+    }
+    
+    return vignette_string
+
+def generate_hdr(world,scene):#TODO
+    
+    world_data = OrderedDict()
+
+    world_data["name"] = world.name
+    world_data["uuid"] = gen_uuid(world)
+
+    hdr = world.b4a_hdr_settings
+
+    hdr_string = TEMPLATE_HDR_SETTINGS % {
+        "enable"            : str(scene.b4a_enable_hdr).lower(),
+        "key"      : str(hdr.key).lower()
+    }
+    
+    return hdr_string
 
 def gen_uuid(comp):
     # type + name + lib path
@@ -2657,7 +2838,7 @@ def save(operator, context, filepath = "",
     else:
         sceneobjects = context.selected_objects
 
-    generate_option(scene.world)#TODO
+    #generate_option(scene.world,scene)#TODO
     # objects are contained in scene and linked groups
     objects = []
 

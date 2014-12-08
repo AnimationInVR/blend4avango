@@ -33,6 +33,45 @@ class B4A_ScenePanel(bpy.types.Panel):
             row = layout.row()
             row.prop(scene, "b4a_enable_bloom", text="Enable Bloom")
 
+            row = layout.row()
+            row.prop(scene, "b4a_enable_fog", text="Enable Bloom")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_vignette", text="Enable Vignette")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_hdr", text="Enable HDR")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_preview_display", text="Enable Preview Display")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_fps_display", text="Enable FPS Display")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_ray_display", text="Enable Ray Display")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_bbox_display", text="Enable bbox Display")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_wire_frame", text="Enable Wire Frame")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_FXAA", text="Enable FXAA")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_frustum_culling", text="Enable Frustum Culling")
+
+            row = layout.row()
+            row.prop(scene, "b4a_enable_backface_culling", text="Enable Backface Culling")
+
+            row = layout.row()
+            row.prop(scene, "b4a_near_clip", text="Near Clip")
+
+            row = layout.row()
+            row.prop(scene, "b4a_far_clip", text="Far Clip")
+
             split = layout.split()
             col = split.column()
 
@@ -98,6 +137,52 @@ class B4A_WorldPanel(bpy.types.Panel):
             row.prop(bloom, "blur", text="Blur")
             row = col.row()
             row.prop(bloom, "edge_lum", text="Edge Luminance")
+
+            fog = world.b4a_fog_settings
+            row = layout.row()
+            box = row.box()
+            col = box.column()
+            col.label("Fog settings:")
+            row = col.row()
+            row.prop(fog, "start", text="Start")
+            row = col.row()
+            row.prop(fog, "end", text="End")
+            row = col.row()
+            row.prop(fog, "texture", text="Texture")
+            row = col.row()
+            row.prop(fog, "color", text="Color")
+
+            background = world.b4a_background_settings
+            row = layout.row()
+            box = row.box()
+            col = box.column()
+            col.label("Background settings:")
+            row = col.row()
+            row.prop(background, "mode", text="Mode")
+            row = col.row()
+            row.prop(background, "texture", text="Texture")
+            row = col.row()
+            row.prop(background, "color", text="Color")
+
+            vignette = world.b4a_vignette_settings
+            row = layout.row()
+            box = row.box()
+            col = box.column()
+            col.label("Vignette settings:")
+            row = col.row()
+            row.prop(vignette, "color", text="Color")
+            row = col.row()
+            row.prop(vignette, "coverage", text="Coverage")
+            row = col.row()
+            row.prop(vignette, "softness", text="Softness")
+
+            key = world.b4a_hdr_settings
+            row = layout.row()
+            box = row.box()
+            col = box.column()
+            col.label("HDR settings:")
+            row = col.row()
+            row.prop(bloom, "key", text="Key")
 
 class B4A_DataPanel(bpy.types.Panel):
     bl_label = "Blend4Avango"

@@ -21,6 +21,7 @@ class B4A_DetailBendingColors(bpy.types.PropertyGroup):
         description = "Vertex color used for leaves stiffness",
         default = ""
     )
+
     overall_stiffness_col = bpy.props.StringProperty(
         name = "B4A: overall stiffness color",
         description = "Vertex color used for overall stiffness",
@@ -646,6 +647,125 @@ class B4A_BloomSettings(bpy.types.PropertyGroup):
         precision = 2
     )
 
+class B4A_FogSettings(bpy.types.PropertyGroup):
+
+    start = bpy.props.FloatProperty(
+        name = "start",
+        description = "start",
+        default = 1.0,
+        min = 0.0,
+        max = 5.0,
+        step = 0.01,
+        precision = 2
+    )
+
+    end = bpy.props.FloatProperty(
+        name = "end",
+        description = "end",
+        default = 4.0,
+        min = 0.0,
+        max = 20.0,
+        step = 0.01,
+        precision = 2
+    )
+
+    texture = bpy.props.StringProperty(
+        name = "texture",
+        description = "texture",
+        default = ""
+    )
+
+    color = bpy.props.FloatVectorProperty(
+        name = "B4A: fog color",
+        description = "Fog color",
+        default = (0.5, 0.5, 0.5),
+        min = 0.0,
+        soft_min = 0.0,
+        max = 1.0,
+        soft_max = 1.0,
+        precision = 3,
+        subtype = 'COLOR',
+        size = 3
+    )
+
+class B4A_BackgroundSettings(bpy.types.PropertyGroup):
+
+    mode = bpy.props.FloatProperty(
+        name = "mode",
+        description = "mode",
+        default = 0.0,
+        min = 0.0,
+        max = 5.0,
+        step = 0.01,
+        precision = 2
+    )
+
+    texture = bpy.props.StringProperty(
+        name = "texture",
+        description = "texture",
+        default = ""
+    )
+
+    color = bpy.props.FloatVectorProperty(
+        name = "B4A: Background color",
+        description = "Background color",
+        default = (0.5, 0.5, 0.5),
+        min = 0.0,
+        soft_min = 0.0,
+        max = 1.0,
+        soft_max = 1.0,
+        precision = 3,
+        subtype = 'COLOR',
+        size = 3
+    )
+
+class B4A_VignetteSettings(bpy.types.PropertyGroup):
+
+    color = bpy.props.FloatVectorProperty(
+        name = "B4A: coverage color",
+        description = "coverage color",
+        default = (0.5, 0.5, 0.5),
+        min = 0.0,
+        soft_min = 0.0,
+        max = 1.0,
+        soft_max = 1.0,
+        precision = 3,
+        subtype = 'COLOR',
+        size = 3
+    )
+
+    coverage = bpy.props.FloatProperty(
+        name = "coverage",
+        description = "coverage",
+        default = 1.0,
+        min = 0.0,
+        max = 5.0,
+        step = 0.01,
+        precision = 2
+    )
+
+    softness = bpy.props.FloatProperty(
+        name = "softness",
+        description = "softness",
+        default = 4.0,
+        min = 0.0,
+        max = 20.0,
+        step = 0.01,
+        precision = 2
+    )
+
+class B4A_HdrSettings(bpy.types.PropertyGroup):
+
+    key = bpy.props.FloatProperty(
+        name = "key",
+        description = "key",
+        default = 1.0,
+        min = 0.0,
+        max = 5.0,
+        step = 0.01,
+        precision = 2
+    )
+
 class B4A_MotionBlurSettings(bpy.types.PropertyGroup):
 
     motion_blur_factor = bpy.props.FloatProperty(
@@ -1036,7 +1156,9 @@ def add_b4a_props():
         step = 0.1,
         precision = 4
     )
+
     bpy.types.World.b4a_fog_density = b4a_fog_density
+
 
     bpy.types.World.b4a_god_rays_settings = bpy.props.PointerProperty(
         name = "B4A: god rays settings",
@@ -1066,6 +1188,26 @@ def add_b4a_props():
     bpy.types.World.b4a_bloom_settings = bpy.props.PointerProperty(
         name = "B4A: bloom settings",
         type = B4A_BloomSettings
+    )
+
+    bpy.types.World.b4a_fog_settings = bpy.props.PointerProperty(
+        name = "B4A: fog settings",
+        type = B4A_FogSettings
+    )
+
+    bpy.types.World.b4a_background_settings = bpy.props.PointerProperty(
+        name = "B4A: background settings",
+        type = B4A_BackgroundSettings
+    )
+
+    bpy.types.World.b4a_vignette_settings = bpy.props.PointerProperty(
+        name = "B4A: vignette settings",
+        type = B4A_VignetteSettings
+    )
+
+    bpy.types.World.b4a_hdr_settings = bpy.props.PointerProperty(
+        name = "B4A: hdr settings",
+        type = B4A_HdrSettings
     )
 
     bpy.types.World.b4a_motion_blur_settings = bpy.props.PointerProperty(
@@ -1417,6 +1559,90 @@ def add_scene_properties():
     )
     scene_type.b4a_enable_ssao = b4a_enable_ssao
 
+    b4a_enable_preview_display = bpy.props.BoolProperty(
+        name = "B4A: enable preview display",
+        description = "enable preview display",
+        default = False
+    )
+    scene_type.b4a_enable_preview_display = b4a_enable_preview_display
+
+    b4a_enable_fps_display = bpy.props.BoolProperty(
+        name = "B4A: enable fps display",
+        description = "enable fps display",
+        default = False
+    )
+    scene_type.b4a_enable_fps_display = b4a_enable_fps_display
+
+    b4a_enable_ray_display = bpy.props.BoolProperty(
+        name = "B4A: enable ray display",
+        description = "enable ray display",
+        default = False
+    )
+    scene_type.b4a_enable_ray_display = b4a_enable_ray_display
+
+    b4a_enable_bbox_display = bpy.props.BoolProperty(
+        name = "B4A: enable bbox display",
+        description = "enable bbox display",
+        default = False
+    )
+    scene_type.b4a_enable_bbox_display = b4a_enable_bbox_display
+
+    b4a_enable_wire_frame = bpy.props.BoolProperty(
+        name = "B4A: enable_wire_frame",
+        description = "enable_wire_frame",
+        default = False
+    )
+    scene_type.b4a_enable_wire_frame = b4a_enable_wire_frame 
+
+    b4a_enable_fxaa = bpy.props.BoolProperty(
+        name = "B4A: enable FXAA",
+        description = "Enable FXAA",
+        default = False
+    )
+    scene_type.b4a_enable_fxaa = b4a_enable_fxaa
+
+    b4a_enable_frustum_culling = bpy.props.BoolProperty(
+        name = "B4A: enable_frustum_culling",
+        description = "enable_frustum_culling",
+        default = False
+    )
+    scene_type.b4a_enable_frustum_culling = b4a_enable_frustum_culling
+
+    b4a_enable_backface_culling = bpy.props.BoolProperty(
+        name = "B4A: enable_backface_culling",
+        description = "enable_backface_culling",
+        default = False
+    )
+    scene_type.b4a_enable_backface_culling = b4a_enable_backface_culling
+
+    b4a_near_clip = bpy.props.FloatProperty(
+        name = "B4A: near clip",
+        description = "near clip",
+        default = 0.1,
+        min = 0.0,
+        soft_min = 0.0,
+        max = 1.0,
+        soft_max = 0.1,
+        step = 0.1,
+        precision = 4
+    )
+
+    scene_type.b4a_near_clip = b4a_near_clip
+
+    b4a_far_clip = bpy.props.FloatProperty(
+        name = "B4A: far clip",
+        description = "far clip",
+        default = 1000.0,
+        min = 0.0,
+        soft_min = 0.0,
+        max = 1000000000.0,
+        soft_max = 0.1,
+        step = 0.1,
+        precision = 4
+    )
+
+    scene_type.b4a_far_clip = b4a_far_clip
+
     b4a_batch_grid_size = bpy.props.FloatProperty(
         name = "B4A: batch grid size",
         description = "Batch grid size in meters, pass zero value to " +
@@ -1448,6 +1674,41 @@ def add_scene_properties():
         default = False
     )
     scene_type.b4a_enable_bloom = b4a_enable_bloom
+
+    b4a_enable_fog = bpy.props.BoolProperty(
+        name = "B4A: enable fog",
+        description = "Enable fog",
+        default = False
+    )
+    scene_type.b4a_enable_fog = b4a_enable_fog
+
+    b4a_enable_vignette = bpy.props.BoolProperty(
+        name = "B4A: enable vignette",
+        description = "Enable vignette",
+        default = False
+    )
+    scene_type.b4a_enable_vignette = b4a_enable_vignette
+
+    b4a_enable_fog = bpy.props.BoolProperty(
+        name = "B4A: enable fog",
+        description = "Enable fog",
+        default = False
+    )
+    scene_type.b4a_enable_fog = b4a_enable_fog
+
+    b4a_enable_FXAA = bpy.props.BoolProperty(
+        name = "B4A: enable fxaa",
+        description = "Enable fxaa",
+        default = False
+    )
+    scene_type.b4a_enable_FXAA = b4a_enable_FXAA
+
+    b4a_enable_hdr = bpy.props.BoolProperty(
+        name = "B4A: enable hdr",
+        description = "Enable hdr",
+        default = False
+    )
+    scene_type.b4a_enable_hdr = b4a_enable_hdr
 
     b4a_enable_motion_blur = bpy.props.BoolProperty(
         name = "B4A: enable motion blur",
@@ -2695,6 +2956,10 @@ def register():
     bpy.utils.register_class(B4A_DetailBendingColors)
     bpy.utils.register_class(B4A_SkySettings)
     bpy.utils.register_class(B4A_BloomSettings)
+    bpy.utils.register_class(B4A_FogSettings)
+    bpy.utils.register_class(B4A_BackgroundSettings)
+    bpy.utils.register_class(B4A_VignetteSettings)
+    bpy.utils.register_class(B4A_HdrSettings)
     bpy.utils.register_class(B4A_DynamicCompressorSettings)
     bpy.utils.register_class(B4A_MotionBlurSettings)
     bpy.utils.register_class(B4A_BoundingsSettings)
@@ -2713,6 +2978,10 @@ def unregister():
     bpy.utils.unregister_class(B4A_DetailBendingColors)
     bpy.utils.unregister_class(B4A_SkySettings)
     bpy.utils.unregister_class(B4A_BloomSettings)
+    bpy.utils.unregister_class(B4A_FogSettings)
+    bpy.utils.unregister_class(B4A_BackgroundSettings)
+    bpy.utils.unregister_class(B4A_VignetteSettings)
+    bpy.utils.unregister_class(B4A_HdrSettings)
     bpy.utils.unregister_class(B4A_DynamicCompressorSettings)
     bpy.utils.unregister_class(B4A_MotionBlurSettings)
     bpy.utils.unregister_class(B4A_BoundingsSettings)
