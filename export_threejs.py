@@ -2604,6 +2604,11 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
             bpy.ops.export_scene.obj(filepath=str(path + ob.name + '.obj'), 
                 check_existing=False,
                 use_selection=True,
+                use_normals=True,
+                use_uvs=True,
+                use_materials=True,
+                axis_forward='-Z',
+                axis_up='Y',
                 path_mode='AUTO'
                 )
         # deselect the object and move on to another if any more are left 
