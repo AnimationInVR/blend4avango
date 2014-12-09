@@ -106,7 +106,7 @@ TEMPLATE_OBJECT = """\
 			"scale"         : %(scale)s,
 			
 			"castShadow"    : %(castShadow)s,
-			"receiveShadow" : %(receiveShadow)s,
+			"receiveShadow" : %(receiveShadow)s
 		}"""
 
             #"groups"        : [ %(group_id)s ],
@@ -1915,13 +1915,13 @@ def generate_objects(data,scene):
 
             visible = obj.THREE_visible
 
-            geometry_string = generate_string('/data/objects/' + geometry_id + '.obj')
+            geometry_string = generate_string('data/objects/' + geometry_id + '.obj')
 
             object_string = TEMPLATE_OBJECT % {
             "type"   : type_string,
             "object_id"   : generate_string(object_id),
             "geometry_id" : geometry_string,
-            "material_id" : '"/data/materials/' + material_string + '.gmd"',
+            "material_id" : '"data/materials/' + material_string + '.gmd"',
             "position"    : generate_vec3(position),
             "quaternion"  : generate_quat(quaternion),
             "scale"       : generate_vec3(scale),
@@ -2714,7 +2714,7 @@ def generate_fog(world,scene):#TODO
         "enable"            : str(scene.b4a_enable_fog).lower(),
         "start"         : round_num(fog.start, 2),
         "end"         : round_num(fog.end, 2),
-        "texture"      : str(fog.texture).lower(),
+        "texture"      : '\"' + str(fog.texture).lower() + '\"',
         "color"      : '[' + str(fog.color.r) + ',' + str(fog.color.g) + ',' + str(fog.color.b) + ']'
     }
     
@@ -2731,7 +2731,7 @@ def generate_background(world,scene):#TODO
 
     background_string = TEMPLATE_BACKGROUND_SETTINGS % {
         "mode"         : round_num(background.mode, 2),
-        "texture"      : str(background.texture).lower(),
+        "texture"      : '\"' + str(background.texture).lower() + '\"',
         "color"      : '[' + str(background.color.r) + ',' + str(background.color.g) + ',' + str(background.color.b) + ']'
     }
     
