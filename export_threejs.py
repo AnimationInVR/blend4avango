@@ -245,8 +245,8 @@ TEMPLATE_PIPELINE_OPTIONS = """\
         "enable_FXAA":%(enable_FXAA)s,
         "enable_frustum_culling":%(enable_frustum_culling)s,
         "enable_backface_culling":%(enable_backface_culling)s,
-        "near_clip":%(near_clip)d,
-        "far_clip":%(far_clip)d
+        "near_clip":%(near_clip)f,
+        "far_clip":%(far_clip)f
         """
 
 TEMPLATE_SSAO_SETTINGS = """\
@@ -2645,7 +2645,7 @@ def generate_pipeline_options(world,scene):#TODO
         "enable_FXAA"            : str(scene.b4a_enable_FXAA).lower(),
         "enable_frustum_culling"            : str(scene.b4a_enable_frustum_culling).lower(),
         "enable_backface_culling"            : str(scene.b4a_enable_backface_culling).lower(),
-        "near_clip"         : round_num(scene.b4a_near_clip, 2),
+        "near_clip"         : round_num(scene.b4a_near_clip, 5),
         "far_clip"      : round_num(scene.b4a_far_clip, 2)
     }
 

@@ -1555,10 +1555,10 @@ def add_scene_properties():
         name = "B4A: near clip",
         description = "near clip",
         default = 0.1,
-        min = 0.0,
-        soft_min = 0.0,
-        max = 1.0,
-        soft_max = 0.1,
+        min = 0.0000001,
+        soft_min = 0.01,
+        max = 1000.0,
+        soft_max = 100.0,
         step = 0.1,
         precision = 4
     )
