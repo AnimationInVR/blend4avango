@@ -34,7 +34,7 @@ class B4A_ScenePanel(bpy.types.Panel):
             row.prop(scene, "b4a_enable_bloom", text="Enable Bloom")
 
             row = layout.row()
-            row.prop(scene, "b4a_enable_fog", text="Enable Bloom")
+            row.prop(scene, "b4a_enable_fog", text="Enable Fog")
 
             row = layout.row()
             row.prop(scene, "b4a_enable_vignette", text="Enable Vignette")

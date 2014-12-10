@@ -625,15 +625,14 @@ class B4A_FogSettings(bpy.types.PropertyGroup):
     )
 
 class B4A_BackgroundSettings(bpy.types.PropertyGroup):
-
+   
     mode = bpy.props.FloatProperty(
         name = "mode",
         description = "mode",
-        default = 0.0,
-        min = 0.0,
-        max = 5.0,
-        step = 0.01,
-        precision = 2
+        default = 0,
+        min = 0,
+        max = 5,
+        step = 1
     )
 
     texture = bpy.props.StringProperty(

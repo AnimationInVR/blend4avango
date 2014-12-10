@@ -252,16 +252,16 @@ TEMPLATE_PIPELINE_OPTIONS = """\
 TEMPLATE_SSAO_SETTINGS = """\
         "ssao_settings": {
             "enable":%(enable)s,
-            "radius":%(radius)d,
-            "intensity":%(intensity)d,
-            "falloff":%(falloff)d
+            "radius":%(radius)f,
+            "intensity":%(intensity)f,
+            "falloff":%(falloff)f
         }"""
 
 TEMPLATE_FOG_SETTINGS = """\
         "fog_settings": {
             "enable":%(enable)s,
-            "start":%(start)d,
-            "end":%(end)d,
+            "start":%(start)f,
+            "end":%(end)f,
             "texture":%(texture)s,
             "color":%(color)s
         }"""
@@ -277,8 +277,8 @@ TEMPLATE_VIGNETTE_SETTINGS = """\
         "vignette_settings": {
             "enable":%(enable)s,
             "color":%(color)s,
-            "coverage":%(coverage)d,
-            "softness":%(softness)d
+            "coverage":%(coverage)f,
+            "softness":%(softness)f
         }"""
 
 TEMPLATE_HDR_SETTINGS = """\
