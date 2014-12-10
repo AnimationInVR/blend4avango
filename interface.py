@@ -97,7 +97,7 @@ class B4A_WorldPanel(bpy.types.Panel):
             row = col.row()
             row.prop(ssao, "intensity", text="Intensity")
             row = col.row()
-            row.prop(ssao, "fallof", text="Fallof")
+            row.prop(ssao, "falloff", text="Falloff")
 
             #god_rays = world.b4a_god_rays_settings
             #row = layout.row()
