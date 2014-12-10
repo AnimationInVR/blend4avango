@@ -1883,7 +1883,7 @@ def generate_objects(data,scene):
             #else:
             geo_name = obj.data.name
 
-            geometry_id = obj.data.name
+            geometry_id = obj.name
 
             material_ids = generate_material_id_list(obj.material_slots)
             group_ids = generate_group_id_list(obj)
